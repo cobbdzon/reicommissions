@@ -2,6 +2,12 @@
 
 // nav
 nav {
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    top: 0;
+
+    z-index: 1;
+
     height: 3rem;
     background-color: #112;
 }
@@ -13,7 +19,7 @@ main {
     gap: 1rem;
 
     width: min(768px, 85%);
-    margin: 1rem auto 0 auto;
+    margin: 1rem auto 1rem auto;
 
     .panel {
         width: 100%;
@@ -94,18 +100,80 @@ main {
                 padding: 0.25em 1em;
                 border: 2px solid #333;
                 border-radius: 2em;
+
+                outline: none;
+
+                transition: border-color 250ms;
+
+                &:focus-visible {
+                    border-color: #aaa;
+                    & + button {
+                        border-color: #fff;
+                    }
+                }
             }
             button {
                 height: 100%;
                 padding: 0 1em;
-                border: 0 transparent;
+                border: 2px solid #222;
                 border-radius: 2em;
 
                 position: absolute;
                 top: 0;
-                right: -0.1em;
+                right: -4px;
 
                 background-color: #222;
+                color: #fff;
+
+                transition: border-color 250ms, background-color 250ms, color 250ms;
+
+                &:hover {
+                    background-color: #fff;
+                    color: #222;
+                }
+            }
+        }
+    }
+
+    #navigation-panel {
+        background-color: transparent;
+        padding: 0;
+        border: 0 transparent;
+
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1rem;
+
+        font-size: min(1rem, 10vw);
+        
+        > button {
+            height: 100%;
+            aspect-ratio: 1;
+            padding: 2em;
+            border: 0.15em solid;
+            border-radius: 1em;
+
+            background-color: #223;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 1em;
+
+            transition: border-color 250ms, background-color 250ms;
+
+            img {
+                max-width: 75%;
+            }
+
+            .nav-title {
+                font-size: 1.5em;
+            }
+
+            &:hover {
+                border-color: #FF4081;
+                background-color: #334;
             }
         }
     }

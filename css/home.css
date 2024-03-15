@@ -5,7 +5,21 @@
   box-sizing: border-box;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; }
 
+img {
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
+  font-style: italic;
+  background-repeat: no-repeat;
+  background-size: cover;
+  shape-margin: 1rem; }
+
 nav {
+  position: -webkit-sticky;
+  /* Safari */
+  position: sticky;
+  top: 0;
+  z-index: 1;
   height: 3rem;
   background-color: #112; }
 
@@ -14,7 +28,7 @@ main {
   flex-direction: column;
   gap: 1rem;
   width: min(768px, 85%);
-  margin: 1rem auto 0 auto; }
+  margin: 1rem auto 1rem auto; }
   main .panel {
     width: 100%;
     padding: 1.75em;
@@ -62,15 +76,54 @@ main {
       width: 100%;
       padding: 0.25em 1em;
       border: 2px solid #333;
-      border-radius: 2em; }
+      border-radius: 2em;
+      outline: none;
+      transition: border-color 250ms; }
+      main #tracking-panel #tracker-id-form input:focus-visible {
+        border-color: #aaa; }
+        main #tracking-panel #tracker-id-form input:focus-visible + button {
+          border-color: #fff; }
     main #tracking-panel #tracker-id-form button {
       height: 100%;
       padding: 0 1em;
-      border: 0 transparent;
+      border: 2px solid #222;
       border-radius: 2em;
       position: absolute;
       top: 0;
-      right: -0.1em;
-      background-color: #222; }
+      right: -4px;
+      background-color: #222;
+      color: #fff;
+      transition: border-color 250ms, background-color 250ms, color 250ms; }
+      main #tracking-panel #tracker-id-form button:hover {
+        background-color: #fff;
+        color: #222; }
+  main #navigation-panel {
+    background-color: transparent;
+    padding: 0;
+    border: 0 transparent;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    font-size: min(1rem, 10vw); }
+    main #navigation-panel > button {
+      height: 100%;
+      aspect-ratio: 1;
+      padding: 2em;
+      border: 0.15em solid;
+      border-radius: 1em;
+      background-color: #223;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 1em;
+      transition: border-color 250ms, background-color 250ms; }
+      main #navigation-panel > button img {
+        max-width: 75%; }
+      main #navigation-panel > button .nav-title {
+        font-size: 1.5em; }
+      main #navigation-panel > button:hover {
+        border-color: #FF4081;
+        background-color: #334; }
 
 /*# sourceMappingURL=home.css.map */
