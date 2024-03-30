@@ -1,0 +1,6 @@
+{
+    "scanForIncludes": [
+        "./index.html",
+        "./lebron/index.html"
+    ]
+}
