@@ -1,3 +1,4 @@
+const CACHE_INCLUDES = false // set to false if editing an include
 const includes_regex = /\[\{(.*?)\}\]/g;
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -17,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const replace_pattern = includes_matches[i];
         const filename = filenames[i];
 
-        if (sessionStorage.getItem(filename)) {
+        if (CACHE_INCLUDES && sessionStorage.getItem(filename)) {
             const element_data = sessionStorage.getItem(filename)
             body.innerHTML = body.innerHTML.replace(replace_pattern, element_data)
         } else {
