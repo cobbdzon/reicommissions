@@ -1,6 +1,6 @@
 {
     "scanForIncludes": [
         "./index.html",
-        "./lebron/index.html"
+        "./gallery/index.html"
     ]
 }
