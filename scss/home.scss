@@ -1,17 +1,5 @@
 @import "./global";
 
-// nav
-nav {
-    position: -webkit-sticky; /* Safari */
-    position: sticky;
-    top: 0;
-
-    z-index: 1;
-
-    height: 3rem;
-    background-color: #112;
-}
-
 // main
 main {
     display: flex;
@@ -169,6 +157,7 @@ main {
 
             .nav-title {
                 font-size: 1.5em;
+                font-weight: bold;
             }
 
             &:hover {
@@ -176,5 +165,24 @@ main {
                 background-color: #334;
             }
         }
+
+        @media screen and (max-width: 512px) {
+            grid-template-columns: 1fr;
+
+            > button {
+                aspect-ratio: 4/1;
+                padding: 1em !important;
+                flex-direction: row;
+
+                img {
+                    max-height: 100%;
+                    margin-right: auto;
+                }
+                .nav-title {
+                    font-size: calc(min(3rem, 10vw) - 0.5rem);
+                    margin-right: auto;
+                }
+            }
+        } 
     }
 }

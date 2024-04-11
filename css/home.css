@@ -14,15 +14,6 @@ img {
   background-size: cover;
   shape-margin: 1rem; }
 
-nav {
-  position: -webkit-sticky;
-  /* Safari */
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  height: 3rem;
-  background-color: #112; }
-
 main {
   display: flex;
   flex-direction: column;
@@ -121,9 +112,23 @@ main {
       main #navigation-panel > button img {
         max-width: 75%; }
       main #navigation-panel > button .nav-title {
-        font-size: 1.5em; }
+        font-size: 1.5em;
+        font-weight: bold; }
       main #navigation-panel > button:hover {
         border-color: #FF4081;
         background-color: #334; }
+    @media screen and (max-width: 512px) {
+      main #navigation-panel {
+        grid-template-columns: 1fr; }
+        main #navigation-panel > button {
+          aspect-ratio: 4/1;
+          padding: 1em !important;
+          flex-direction: row; }
+          main #navigation-panel > button img {
+            max-height: 100%;
+            margin-right: auto; }
+          main #navigation-panel > button .nav-title {
+            font-size: calc(min(3rem, 10vw) - 0.5rem);
+            margin-right: auto; } }
 
 /*# sourceMappingURL=home.css.map */
