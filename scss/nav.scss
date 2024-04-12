@@ -13,22 +13,34 @@ nav {
 
     background-color: #112;
 
+    color: #fff;
     font-family: monospace;
     font-weight: bold;
 
+    text-decoration: none;
+
     * {
+        color: inherit;
         font-family: inherit;
+        text-decoration: inherit;
     }
 
     #nav-title {
         display: flex;
         align-items: center;
-        gap: 0.25em;
 
         font-size: 2em;
 
-        div {
-            font-family: inherit;
+        > div {
+            padding-inline: 0.25em;
+            border-radius: 0.25em;
+        }
+
+        .title {
+            transition: background-color 250ms;
+            &:hover {
+                background-color: hsla(0, 100%, 100%, 10%);
+            }
         }
 
         .subtitle {
@@ -47,6 +59,10 @@ nav {
 
         div {
             cursor: pointer;
+            transition: color 250ms;
+            &:hover {
+                color: #FF4081;
+            }
         }
     }
 

@@ -10,17 +10,25 @@ nav {
   grid-template-columns: 1fr 1fr;
   gap: 1em;
   background-color: #112;
+  color: #fff;
   font-family: monospace;
-  font-weight: bold; }
+  font-weight: bold;
+  text-decoration: none; }
   nav * {
-    font-family: inherit; }
+    color: inherit;
+    font-family: inherit;
+    text-decoration: inherit; }
   nav #nav-title {
     display: flex;
     align-items: center;
-    gap: 0.25em;
     font-size: 2em; }
-    nav #nav-title div {
-      font-family: inherit; }
+    nav #nav-title > div {
+      padding-inline: 0.25em;
+      border-radius: 0.25em; }
+    nav #nav-title .title {
+      transition: background-color 250ms; }
+      nav #nav-title .title:hover {
+        background-color: rgba(255, 255, 255, 0.1); }
     nav #nav-title .subtitle {
       color: #bbb;
       font-size: 0.75em; }
@@ -31,7 +39,10 @@ nav {
     justify-content: end;
     gap: 2em; }
     nav #nav-links div {
-      cursor: pointer; }
+      cursor: pointer;
+      transition: color 250ms; }
+      nav #nav-links div:hover {
+        color: #FF4081; }
   @media screen and (max-width: 768px) {
     nav {
       padding-inline: 0;
