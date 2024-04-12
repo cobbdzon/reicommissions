@@ -22,9 +22,9 @@ for (let i = 0; i < scanForIncludes.length; i++) {
         const raw_html = data.toString();
         let new_html = raw_html
     
-        const includes_matches = body.innerHTML.match(includes_regex);
+        const includes_matches = raw_html.match(includes_regex);
 
-        const includes_raw_args = body.innerHTML.match(includes_regex);
+        const includes_raw_args = raw_html.match(includes_regex);
         includes_raw_args.forEach((str, index) => {
             includes_raw_args[index] = str.slice(2, -2)
         });
