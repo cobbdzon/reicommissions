@@ -152,4 +152,5 @@ function buildIncludes(config) {
     }
 }
 
+export default loadIncludes
 export {loadIncludes, buildIncludes}
