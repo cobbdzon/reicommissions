@@ -1,101 +1,155 @@
-const fs = require('fs');
-const { promisify } = require('util');
+const INCLUDES_REGEX = /\[\{(.*?)\}\]/g;
+const DEV_SCRIPT_REGEX = /<script type="module" src=".*modularDev\.js"><\/script>/g
 
-const config = require("./config.json")
-const scanForIncludes = config.scanForIncludes
+function getData (input_html) {
+    const patterns = input_html.match(INCLUDES_REGEX);
 
-const includes_regex = /\[\{(.*?)\}\]/g;
-const dev_script_regex = /<script src=".*modularDev\.js"><\/script>/g
+    const raw_args = input_html.match(INCLUDES_REGEX);
 
-const readFile = promisify(fs.readFile)
-const writeFile = promisify(fs.writeFile)
+    raw_args.forEach((str, index) => {
+        raw_args[index] = str.slice(2, -2)
+    });
 
-// includes are static, lets lazy cache them
-const includes_cache = {}
+    const filenames = []
+    raw_args.forEach((str, index) => {
+        filenames[index] = str.split(", ")[0]
+    });
 
-for (let i = 0; i < scanForIncludes.length; i++) {
-    const html_filepath = scanForIncludes[i];
+    const args = []
+    raw_args.forEach((str, index) => {
+        const arg_data = []
 
-    console.log("Build: " + html_filepath + " initializing")
-    readFile(html_filepath).catch(console.error).then((data) => {
-        // Transform data Buffer to string.
-        const raw_html = data.toString();
-        let new_html = raw_html
-    
-        const includes_matches = raw_html.match(includes_regex);
+        const string_args = str.split(", ")
+        string_args.splice(0, 1) // remove filename
 
-        const includes_raw_args = raw_html.match(includes_regex);
-        includes_raw_args.forEach((str, index) => {
-            includes_raw_args[index] = str.slice(2, -2)
-        });
-    
-        const filenames = []
-        includes_raw_args.forEach((str, index) => {
-            filenames[index] = str.split(", ")[0]
-            console.log(filenames[index])
-        });
-    
-        const includes_args = []
-        includes_raw_args.forEach((str, index) => {
-            const args = []
-    
-            const string_args = str.split(", ")
-            string_args.splice(0, 1) // remove filename
-    
-            string_args.forEach((str, index) => {
-                //splitted_args = str.split("=")
-                //const key = splitted_args[0]
-                //const value = splitted_args[1]
-                args[index] = str.split("=")
-            })
-    
-            includes_args[index] = args
+        string_args.forEach((str, index) => {
+            //splitted_args = str.split("=")
+            //const key = splitted_args[0]
+            //const value = splitted_args[1]
+            arg_data[index] = str.split("=")
         })
-    
-        new_html = new_html.replace(dev_script_regex, "")
-    
-        const promises = []
-    
-        for (let i = 0; i < filenames.length; i++) {
-            const replace_pattern = includes_matches[i];
-            const filename = filenames[i];
-            const file_args = includes_args[i];
-    
-            if (includes_cache[filename]) {
-                promises[i] = new Promise((resolve) => {
-                    const element_data = includes_cache[filename]
-                    new_html = new_html.replace(replace_pattern, element_data)
-                    resolve()
-                })
-            } else {
-                promises[i] = readFile('./includes/' + filename).then((data) => {
-                    const element_data = data.toString()
 
-                    // process arguments
-                    var proccessed_data = new_html.replace(replace_pattern, element_data)
-                    if (file_args.length > 0) {
-                        for (let arg_i = 0; arg_i < file_args.length; arg_i++) {
-                            const arg_data = file_args[arg_i];
-                            const key = arg_data[0];
-                            const value = arg_data[1];
+        args[index] = arg_data
+    })
 
-                            proccessed_data = proccessed_data.replace(`[{${key}}]`, value)
-                            console.log("lefart")
-                        }
-                    }
-
-                    new_html = proccessed_data
-                    includes_cache[filename] = proccessed_data
-                }).catch(() => {
-                    new_html = new_html.replace(replace_pattern, "Failed to load: " + filename)
-                })
-            }
+    // unique filenames
+    const unique_filenames = {}
+    for (let i = 0; i < filenames.length; i++) {
+        const filename = filenames[i];
+        const isUnique = !unique_filenames[filename];
+        if (isUnique) {
+            unique_filenames[filename] = []
         }
-    
-        // html has been injected
-        Promise.allSettled(promises).then(() => {
-            console.log("Build: " + html_filepath + " success!")
-            writeFile(html_filepath, new_html)
-        })
+
+        const filename_indexes = unique_filenames[filename]
+        filename_indexes.push(i)
+    }
+
+    //console.log(unique_filenames)
+
+    return [patterns, filenames, unique_filenames, args]
+}
+
+function createPromiseForFilenames(input_html, unique_filenames, handlerPromise) {
+    const promises = []
+
+    for (let filename in unique_filenames) {
+        const indexes = unique_filenames[filename]
+
+        promises.push(new Promise( async (resolve) => {
+            for (let i = 0; i < indexes.length; i++) {
+                const filename_index = indexes[i];
+                await handlerPromise(filename_index)
+            }
+            resolve()
+        } ))
+    }
+
+    //return Promise.all(promises)
+    return Promise.all(promises)
+}
+
+function processHTML(input_html, html_data) {
+    const [patterns, filenames, unique_filenames, args] = html_data // unpack data
+
+    const replace_queue = []
+    async function _process(i, processed_html) {
+        const replace_pattern = patterns[i];
+        const filename = filenames[i];
+        const file_args = args[i];
+
+        const response = await fetch('/includes/' + filename)
+
+        if (response.ok) {
+            const element_data = await response.text()
+            sessionStorage.setItem(filename, element_data)
+
+            // process arguments
+            replace_queue.push([replace_pattern, element_data])
+            //processed_html = processed_html.replace(replace_pattern, element_data)
+            if (file_args.length > 0) {
+                for (let arg_i = 0; arg_i < file_args.length; arg_i++) {
+                    const arg_data = file_args[arg_i];
+                    const key = arg_data[0];
+                    const value = arg_data[1];
+
+                    replace_queue.push([`[{${key}}]`, value])
+                    //processed_html = processed_html.replace(`[{${key}}]`, value)
+                }
+            }
+        } else {
+            replace_queue.push([replace_pattern, "Failed to load: " + filename])
+        }
+        //console.log(filename, i)
+        //return processed_html
+    }
+
+    return createPromiseForFilenames(input_html, unique_filenames, _process).then(() => {
+        var proccessed_html = input_html
+        for (let i = 0; i < replace_queue.length; i++) {
+            const [pattern, replacement] = replace_queue[i];
+            proccessed_html = proccessed_html.replace(pattern, replacement)
+        }
+        return proccessed_html
     })
 }
+
+function loadIncludes(input_html) {
+    const html_data = getData(input_html)
+    //const [patterns, filenames, unique_filenames, args] = html_data
+
+    processHTML(input_html, html_data).then((proccessed_html) => {
+        document.body.innerHTML = proccessed_html
+    })
+}
+
+function buildIncludes(config) {
+    const fs = require('fs');
+    const { promisify } = require('util');
+
+    const scanForIncludes = config.scanForIncludes
+    const html_data = getData(input_html)
+    //const [patterns, filenames, unique_filenames, args] = html_data
+
+    const readFile = promisify(fs.readFile)
+    const writeFile = promisify(fs.writeFile)
+
+    for (let i = 0; i < scanForIncludes.length; i++) {
+        const html_filepath = scanForIncludes[i];
+        console.log("Build: " + html_filepath + " initializing")
+        readFile(html_filepath).catch(console.error).then((data) => {
+            // Transform data Buffer to string.
+            const input_html = data.toString();
+
+            processHTML(input_html, html_data).then((proccessed_html) => {
+                // remove script
+                proccessed_html = proccessed_html.replace(DEV_SCRIPT_REGEX, "")
+
+                console.log("Build: " + html_filepath + " success!")
+                writeFile(html_filepath, proccessed_html)
+            })
+        })
+    }
+}
+
+export {loadIncludes, buildIncludes}
