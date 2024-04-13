@@ -1,4 +1,4 @@
-import modular from "./modular.mjs";
+import { buildIncludes } from "./modular.mjs";
 
 import config from "./config.json" assert { type: 'json' };
-modular.buildIncludes(config)
+buildIncludes(config)
