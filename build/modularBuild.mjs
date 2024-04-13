@@ -1,4 +1,4 @@
 import modular from "./modular.mjs";
 
-const config = require("./config.json")
+import config from "./config.json";
 modular.buildIncludes(config)
