@@ -7,4 +7,4 @@ inputs:
 
 runs:
   using: 'node16'
-  main: 'build/modular.js'
+  main: 'build/modularBuild.js'
