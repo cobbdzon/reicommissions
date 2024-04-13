@@ -1,2 +1,2 @@
-import { loadIncludes } from "../build/modular.js";
+import { loadIncludes } from "../build/modular.mjs";
 loadIncludes(document.body.innerHTML)
