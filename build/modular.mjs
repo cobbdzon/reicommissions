@@ -127,11 +127,10 @@ function buildIncludes(config, mods) {
     const [fs, promisify] = mods
 
     const scanForIncludes = config.scanForIncludes
-    const html_data = getData(input_html)
-    //const [patterns, filenames, unique_filenames, args] = html_data
-
     const readFile = promisify(fs.readFile)
     const writeFile = promisify(fs.writeFile)
+
+    //const [patterns, filenames, unique_filenames, args] = html_data
 
     for (let i = 0; i < scanForIncludes.length; i++) {
         const html_filepath = scanForIncludes[i];
@@ -139,6 +138,7 @@ function buildIncludes(config, mods) {
         readFile(html_filepath).catch(console.error).then((data) => {
             // Transform data Buffer to string.
             const input_html = data.toString();
+            const html_data = getData(input_html)
 
             processHTML(input_html, html_data).then((proccessed_html) => {
                 // remove script
