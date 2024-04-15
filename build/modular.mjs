@@ -102,7 +102,7 @@ function processHTML(input_html, html_data, buildMods) {
 
         const element_data = await getInclude(filename, buildMods)
         if (element_data) {
-            sessionStorage.setItem(filename, element_data)
+            //sessionStorage.setItem(filename, element_data)
 
             // process arguments
             replace_queue.push([replace_pattern, element_data])
