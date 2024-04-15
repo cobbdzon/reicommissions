@@ -123,9 +123,8 @@ function loadIncludes(input_html) {
     })
 }
 
-function buildIncludes(config) {
-    const fs = require('fs');
-    const { promisify } = require('util');
+function buildIncludes(config, mods) {
+    const [fs, promisify] = mods
 
     const scanForIncludes = config.scanForIncludes
     const html_data = getData(input_html)
