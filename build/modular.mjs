@@ -50,6 +50,26 @@ function getData (input_html) {
     return [patterns, filenames, unique_filenames, args]
 }
 
+async function getInclude(filename, buildMods) {
+    if (buildMods) {
+        const [fs, promisify] = buildMods
+        const readFile = promisify(fs.readFile)
+        //const writeFile = promisify(fs.writeFile)
+
+        const data = await readFile("./includes/" + filename)
+        const element_data = data.toString()
+        return element_data
+    } else {
+        const response = await fetch ("/includes/" + filename)
+        if (response.ok) {
+            const element_data = await response.text()
+            return element_data
+        } else {
+            return false
+        }
+    }
+}
+
 function createPromiseForFilenames(input_html, unique_filenames, handlerPromise) {
     const promises = []
 
@@ -69,7 +89,7 @@ function createPromiseForFilenames(input_html, unique_filenames, handlerPromise)
     return Promise.all(promises)
 }
 
-function processHTML(input_html, html_data, includes_path) {
+function processHTML(input_html, html_data, buildMods) {
     const [patterns, filenames, unique_filenames, args] = html_data // unpack data
 
     const replace_queue = []
@@ -78,10 +98,10 @@ function processHTML(input_html, html_data, includes_path) {
         const filename = filenames[i];
         const file_args = args[i];
 
-        const response = await fetch (includes_path + filename)
+        //const response = await fetch (includes_path + filename)
 
-        if (response.ok) {
-            const element_data = await response.text()
+        const element_data = await getInclude(filename, buildMods)
+        if (element_data) {
             sessionStorage.setItem(filename, element_data)
 
             // process arguments
@@ -118,13 +138,13 @@ function loadIncludes(input_html) {
     const html_data = getData(input_html)
     //const [patterns, filenames, unique_filenames, args] = html_data
 
-    processHTML(input_html, html_data, "/includes/").then((proccessed_html) => {
+    processHTML(input_html, html_data).then((proccessed_html) => {
         document.body.innerHTML = proccessed_html
     })
 }
 
-function buildIncludes(config, mods) {
-    const [fs, promisify] = mods
+function buildIncludes(config, buildMods) {
+    const [fs, promisify] = buildMods
 
     const scanForIncludes = config.scanForIncludes
     const readFile = promisify(fs.readFile)
@@ -140,7 +160,7 @@ function buildIncludes(config, mods) {
             const input_html = data.toString();
             const html_data = getData(input_html)
 
-            processHTML(input_html, html_data, "./includes/").then((proccessed_html) => {
+            processHTML(input_html, html_data, buildMods).then((proccessed_html) => {
                 // remove script
                 proccessed_html = proccessed_html.replace(DEV_SCRIPT_REGEX, "")
 
