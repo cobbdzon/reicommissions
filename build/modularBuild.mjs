@@ -1,5 +1,5 @@
 import { buildIncludes } from "./modular.mjs";
-import "fs";
+import fs from "fs";
 import { promisify } from "util";
 
 import config from "./config.json" assert { type: 'json' };
