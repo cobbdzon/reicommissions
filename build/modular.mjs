@@ -69,7 +69,7 @@ function createPromiseForFilenames(input_html, unique_filenames, handlerPromise)
     return Promise.all(promises)
 }
 
-function processHTML(input_html, html_data) {
+function processHTML(input_html, html_data, includes_path) {
     const [patterns, filenames, unique_filenames, args] = html_data // unpack data
 
     const replace_queue = []
@@ -78,7 +78,7 @@ function processHTML(input_html, html_data) {
         const filename = filenames[i];
         const file_args = args[i];
 
-        const response = await fetch('/includes/' + filename)
+        const response = await fetch (includes_path + filename)
 
         if (response.ok) {
             const element_data = await response.text()
@@ -118,7 +118,7 @@ function loadIncludes(input_html) {
     const html_data = getData(input_html)
     //const [patterns, filenames, unique_filenames, args] = html_data
 
-    processHTML(input_html, html_data).then((proccessed_html) => {
+    processHTML(input_html, html_data, "/includes/").then((proccessed_html) => {
         document.body.innerHTML = proccessed_html
     })
 }
@@ -140,7 +140,7 @@ function buildIncludes(config, mods) {
             const input_html = data.toString();
             const html_data = getData(input_html)
 
-            processHTML(input_html, html_data).then((proccessed_html) => {
+            processHTML(input_html, html_data, "./includes/").then((proccessed_html) => {
                 // remove script
                 proccessed_html = proccessed_html.replace(DEV_SCRIPT_REGEX, "")
 
